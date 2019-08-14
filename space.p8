@@ -15,6 +15,7 @@ function _init()
 	}
 	bullets={}
 	enemies={}
+	explosions={}
 	for i=1,4 do
 		add(enemies,{
 			sp=17,
@@ -71,6 +72,10 @@ function coll(a,b)
 	return true
 end
 
+function explode(x,y)
+	add(explosions,{x=x,y=y,t=0})
+end
+
 function fire()
 	local b = {
 	sp=3,
@@ -90,6 +95,13 @@ function update_game()
 		if ship.t > 30 then
 			ship.imm=false
 			ship.t=0
+		end
+	end
+	
+	for ex in all(explosions) do
+		ex.t+=1
+		if ex.t==13 then
+			del(explosions,ex)
 		end
 	end
 	
@@ -117,6 +129,7 @@ function update_game()
 			if coll(b,e) then
 				del(enemies,e)
 				ship.p+=1
+				explode(e.x,e.y)
 			end
 		end
 	end
@@ -136,9 +149,13 @@ end
 
 function draw_game()
 	cls()
-	print(ship.p)
+	print(ship.p,0,0,7)
 	if not ship.imm or t%8<4 then
 	 spr(ship.sp,ship.x,ship.y)
+	end
+	
+	for ex in all(explosions) do
+		circ(ex.x,ex.y,ex.t/2,8+ex.t%3)
 	end
 	
 	for b in all(bullets) do
@@ -156,7 +173,6 @@ function draw_game()
 			spr(34,90+6*i,3)
 		end
 	end
---	spr(17,30,30)
 end
 __gfx__
 000000000080080000800800000aa000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
